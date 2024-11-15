@@ -1,0 +1,59 @@
+{
+    "name": "milanmalla/simple-restaurant",
+    "description": "Easily allows to create menus.",
+    "homepage": "https://milanmalla.com/simple-restaurant",
+    "type": "wordpress-plugin",
+    "license": "GPL-3.0-or-later",
+    "minimum-stability": "dev",
+    "prefer-stable": true,
+    "authors": [
+      {
+        "name": "Milan Malla",
+        "email": "mail@milanmalla.com"
+      }
+    ],
+    "config": {
+      "process-timeout": 0,
+      "sort-packages": true,
+      "preferred-install": "dist",
+      "allow-plugins": {
+        "composer/installers": true,
+        "roots/wordpress-core-installer": true,
+        "dealerdirect/phpcodesniffer-composer-installer": true
+      }
+    },
+    "require": {
+      "php": ">=5.6.20",
+      "composer/installers": "2.0.1"
+    },
+    "require-dev": {
+      "phpunit/phpunit": "^5 || ^7",
+      "roots/wordpress": "5.8.0",
+      "spatie/phpunit-watcher": "1.8.3",
+      "psr/container": "1.0.0",
+      "jolicode/jolinotif": "2.3.0",
+      "vlucas/phpdotenv": "5.4.1",
+      "wp-cli/db-command": "2.0.19",
+      "wp-cli/i18n-command": "2.2.13",
+      "wp-phpunit/wp-phpunit": "5.8.2",
+      "wpeverest/wpeverest-sniffs": "0.1.2"
+    },
+    "scripts": {
+      "phpcs": [
+        "phpcs -s -p"
+      ],
+      "phpcs-pre-commit": [
+        "phpcs -s -p -n"
+      ],
+      "phpcbf": [
+        "phpcbf -p"
+      ],
+      "makepot": [
+        "@makepot:audit --skip-audit"
+      ],
+      "makepot:audit": [
+        "wp --allow-root i18n make-pot . --exclude=\".github,.wordpress-org,bin,node_modules,vendor,tests\" --slug=everest-forms"
+      ]
+    }
+  }
+  
