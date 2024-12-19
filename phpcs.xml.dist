@@ -40,13 +40,13 @@
 
 	<rule ref="WordPress.Files.FileName.InvalidClassFileName">
 		<exclude-pattern>includes/**/abstract-*.php</exclude-pattern>
-		<exclude-pattern>includes/class-everest-forms.php</exclude-pattern>
+		<exclude-pattern>includes/class-simple-restaurant.php</exclude-pattern>
 	</rule>
 
 	<!-- Custom rule properties -->
 	<rule ref="WordPress.WP.I18n">
 		<properties>
-			<property name="text_domain" type="array" value="everest-forms" />
+			<property name="text_domain" type="array" value="simple-restaurant" />
 		</properties>
 	</rule>
 

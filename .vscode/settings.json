@@ -1,0 +1,35 @@
+{
+	"folders": [
+	  {
+		"path": "."
+	  }
+	],
+	"settings": {
+	  "files.associations": {
+		"*.php": "php",
+		"*.scss": "scss",
+		"*.css": "css"
+	  },
+	  "editor.formatOnSave": true,
+	  "scss.lint.unknownAtRules": "ignore",
+	  "grunt.autoDetect": "on",
+	  "php.validate.executablePath": "/path/to/php", // Update with your PHP path
+	  "editor.tabSize": 2
+	},
+	"tasks": {
+	  "version": "2.0.0",
+	  "tasks": [
+		{
+		  "label": "Run Grunt",
+		  "type": "shell",
+		  "command": "grunt",
+		  "problemMatcher": []
+		}
+	  ]
+	},
+	"extensions": [
+	  "felixfbecker.php-debug",
+	  "dbaeumer.vscode-eslint",
+	  "svelte.svelte-vscode"
+	]
+  }
