@@ -3,7 +3,7 @@
  * Plugin Name: Simple Restaurant
  * Plugin URI: https://milanmalla.com/simple-restaurant
  * Description: Create Restaurant Menu, Locations, Gallery and Career pages and Many More with Ease.
- * Version: 1.0.0
+ * Version: 1.5
  * Author: Milan Malla
  * Author URI: https://milanmalla.com
  * Text Domain: simple-restaurant
@@ -14,6 +14,11 @@
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
+}
+
+// Define EVF_PLUGIN_FILE.
+if ( ! defined( 'SR_PLUGIN_VERSION' ) ) {
+	define( 'SR_PLUGIN_VERSION', '1.5' );
 }
 
 // Define EVF_PLUGIN_FILE.
@@ -42,7 +47,7 @@ function sr_enqueue_scripts() {
 		'sr-job-filter-block',
 		plugins_url( '/build/block.js', __FILE__ ),
 		array( 'wp-blocks', 'wp-element', 'wp-editor', 'wp-components' ),
-		1,
+		SR_PLUGIN_VERSION,
 		true
 	);
 
@@ -69,7 +74,7 @@ function sr_enqueue_frontend_scripts() {
 		'sr-job-filter-block',
 		plugins_url( '/build/block.js', __FILE__ ),
 		array( 'wp-blocks', 'wp-element', 'wp-editor', 'wp-components' ),
-		1,
+		SR_PLUGIN_VERSION,
 		true
 	);
 
@@ -216,69 +221,17 @@ add_action(
 	}
 );
 
-/**
- * Styles.
- *
- * @since 1.0.0
- */
-function sr_register_block() {
-	register_block_type(
-		'srm/job-filter',
-		array(
-			'editor_script'   => 'sr-job-filter-block',
-			'render_callback' => 'sr_render_job_filter_block',
-		)
+function render_job_filter_block( $attributes ) {
+	// Output the block HTML, including attributes in a data-attribute
+	return sprintf(
+			'<div id="sr-job-filter-root" data-attributes="%s"></div>',
+			esc_attr( json_encode( $attributes ) ) // Encode attributes as JSON
 	);
 }
-add_action( 'init', 'sr_register_block' );
 
-/**
- * Filer.
- *
- * @since 1.0.0
- */
-function sr_render_job_filter_block() {
-	ob_start(); // Start output buffering.
-	?>
-	<div id="sr-job-filter-root"></div> <!-- Placeholder for your React app -->
-	<script>
-			// Any inline script or variable setup can go here if needed
-	</script>
-	<?php
-	return ob_get_clean(); // Return the output.
-}
-
-/**
- * Styles.
- *
- * @since 1.0.0
- */
-function jfp_enqueue_styles() {
-	// Enqueue the stylesheet.
-	wp_enqueue_style(
-		'job-filter-style',
-		plugins_url( '/style.css', __FILE__ ), // Path to the style.css file.
-		array(), // Dependencies (if any).
-		1 // Version (optional).
-	);
-}
-add_action( 'wp_enqueue_scripts', 'jfp_enqueue_styles' );
-
-/**
- * Styles.
- *
- * @since 1.0.0
- */
-function jfp_enqueue_block_editor_styles() {
-	// Enqueue the stylesheet for the block editor.
-	wp_enqueue_style(
-		'job-filter-editor-style',
-		plugins_url( '/style.css', __FILE__ ), // Path to the style.css file.
-		array(), // Dependencies (if any).
-		1 // Version (optional).
-	);
-}
-add_action( 'enqueue_block_editor_assets', 'jfp_enqueue_block_editor_styles' );
+register_block_type( 'sr/job-filter', array(
+	'render_callback' => 'render_job_filter_block',
+) );
 
 add_action( 'admin_menu', 'simple_restaurant_add_submenus' );
 
