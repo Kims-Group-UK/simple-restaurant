@@ -1,1 +1,259 @@
-(()=>{"use strict";const e=window.React,{registerBlockType:t}=wp.blocks,{InspectorControls:a}=wp.blockEditor,{PanelBody:l,SelectControl:n}=wp.components,{useState:o,useEffect:r}=wp.element,s=({attributes:t,setAttributes:s})=>{const[c,i]=o([]),[m,u]=o([]),[d,b]=o([]),[p,j]=o(""),[_,h]=o(""),[E,g]=o(""),[f,v]=o([]),[y,N]=o(null),{layout:w}=t||{};return r((()=>{fetch(`${sr_job_ajax_object.ajax_url}?action=get_locations`).then((e=>e.json())).then((e=>i(e))),fetch(`${sr_job_ajax_object.ajax_url}?action=get_positions`).then((e=>e.json())).then((e=>u(e))),fetch(`${sr_job_ajax_object.ajax_url}?action=get_types`).then((e=>e.json())).then((e=>b(e)))}),[]),(0,e.createElement)(e.Fragment,null,(0,e.createElement)(a,null,(0,e.createElement)(l,{title:"Layout Settings"},(0,e.createElement)(n,{label:"Layout",value:w,options:[{label:"Left-to-Right",value:"left-right"},{label:"Right-to-Left",value:"right-left"},{label:"Stacked",value:"stacked"}],onChange:e=>(e=>{s({layout:e})})(e)}))),(0,e.createElement)("div",{className:`container layout-${w}`},(0,e.createElement)("div",{className:"row"},(0,e.createElement)("div",{className:"col-md-4 col-sm-12"},(0,e.createElement)("div",{className:"sr-job-filter"},(0,e.createElement)(n,{label:"Location",value:p,options:c.map((e=>({label:e.name,value:e.id}))),onChange:j}),(0,e.createElement)(n,{label:"Position",value:_,options:m.map((e=>({label:e.name,value:e.id}))),onChange:h}),(0,e.createElement)(n,{label:"Type",value:E,options:d.map((e=>({label:e.name,value:e.id}))),onChange:g}),(0,e.createElement)("button",{className:"button button-primary",onClick:()=>{const e=new FormData;e.append("action","sr_job_filter_jobs"),e.append("sr-job-filter-nonce",sr_job_ajax_object.sr_job_filter_nonce),p&&e.append("location",p),_&&e.append("position",_),E&&e.append("type",E),fetch(sr_job_ajax_object.ajax_url,{method:"POST",body:e}).then((e=>e.json())).then((e=>v(e)))}},"Filter Jobs"))),(0,e.createElement)("div",{className:"col-md-8 col-sm-12"},f.length>0&&(0,e.createElement)("div",{className:"sr-job-results"},f.map((t=>(0,e.createElement)("div",{className:"col",key:t.id},(0,e.createElement)("h2",{className:"has-large-font-size"},(0,e.createElement)("strong",null,t.title)),y!==t.id?(0,e.createElement)(e.Fragment,null,(0,e.createElement)("p",{className:"has-medium-font-size",dangerouslySetInnerHTML:{__html:t.excerpt}}),(0,e.createElement)("button",{onClick:()=>{return e=t.id,void N(y===e?null:e);var e}},"View More")):(0,e.createElement)("div",{id:`sr-job-content-${t.id}`,className:"job-content"},(0,e.createElement)("p",{dangerouslySetInnerHTML:{__html:t.content}}),(0,e.createElement)("a",{className:"sr-job-apply",href:t.apply_url},"Apply"))))))))))};t("sr/job-filter",{title:"Job Filter",category:"widgets",attributes:{layout:{type:"string",default:"stacked"}},edit:s,save:()=>null}),document.addEventListener("DOMContentLoaded",(function(){const t=document.getElementById("sr-job-filter-root");if(t){const a=JSON.parse(t.getAttribute("data-attributes"));ReactDOM.render((0,e.createElement)(s,{attributes:a}),t)}}))})();
+/******/ (() => { // webpackBootstrap
+/******/ 	"use strict";
+/******/ 	var __webpack_modules__ = ({
+
+/***/ "react":
+/*!************************!*\
+  !*** external "React" ***!
+  \************************/
+/***/ ((module) => {
+
+module.exports = window["React"];
+
+/***/ })
+
+/******/ 	});
+/************************************************************************/
+/******/ 	// The module cache
+/******/ 	var __webpack_module_cache__ = {};
+/******/ 	
+/******/ 	// The require function
+/******/ 	function __webpack_require__(moduleId) {
+/******/ 		// Check if module is in cache
+/******/ 		var cachedModule = __webpack_module_cache__[moduleId];
+/******/ 		if (cachedModule !== undefined) {
+/******/ 			return cachedModule.exports;
+/******/ 		}
+/******/ 		// Create a new module (and put it into the cache)
+/******/ 		var module = __webpack_module_cache__[moduleId] = {
+/******/ 			// no module.id needed
+/******/ 			// no module.loaded needed
+/******/ 			exports: {}
+/******/ 		};
+/******/ 	
+/******/ 		// Execute the module function
+/******/ 		__webpack_modules__[moduleId](module, module.exports, __webpack_require__);
+/******/ 	
+/******/ 		// Return the exports of the module
+/******/ 		return module.exports;
+/******/ 	}
+/******/ 	
+/************************************************************************/
+/******/ 	/* webpack/runtime/compat get default export */
+/******/ 	(() => {
+/******/ 		// getDefaultExport function for compatibility with non-harmony modules
+/******/ 		__webpack_require__.n = (module) => {
+/******/ 			var getter = module && module.__esModule ?
+/******/ 				() => (module['default']) :
+/******/ 				() => (module);
+/******/ 			__webpack_require__.d(getter, { a: getter });
+/******/ 			return getter;
+/******/ 		};
+/******/ 	})();
+/******/ 	
+/******/ 	/* webpack/runtime/define property getters */
+/******/ 	(() => {
+/******/ 		// define getter functions for harmony exports
+/******/ 		__webpack_require__.d = (exports, definition) => {
+/******/ 			for(var key in definition) {
+/******/ 				if(__webpack_require__.o(definition, key) && !__webpack_require__.o(exports, key)) {
+/******/ 					Object.defineProperty(exports, key, { enumerable: true, get: definition[key] });
+/******/ 				}
+/******/ 			}
+/******/ 		};
+/******/ 	})();
+/******/ 	
+/******/ 	/* webpack/runtime/hasOwnProperty shorthand */
+/******/ 	(() => {
+/******/ 		__webpack_require__.o = (obj, prop) => (Object.prototype.hasOwnProperty.call(obj, prop))
+/******/ 	})();
+/******/ 	
+/******/ 	/* webpack/runtime/make namespace object */
+/******/ 	(() => {
+/******/ 		// define __esModule on exports
+/******/ 		__webpack_require__.r = (exports) => {
+/******/ 			if(typeof Symbol !== 'undefined' && Symbol.toStringTag) {
+/******/ 				Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+/******/ 			}
+/******/ 			Object.defineProperty(exports, '__esModule', { value: true });
+/******/ 		};
+/******/ 	})();
+/******/ 	
+/************************************************************************/
+var __webpack_exports__ = {};
+// This entry needs to be wrapped in an IIFE because it needs to be isolated against other modules in the chunk.
+(() => {
+/*!**********************!*\
+  !*** ./src/block.js ***!
+  \**********************/
+__webpack_require__.r(__webpack_exports__);
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! react */ "react");
+/* harmony import */ var react__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_0__);
+
+const {
+  registerBlockType
+} = wp.blocks;
+const {
+  InspectorControls
+} = wp.blockEditor;
+const {
+  PanelBody,
+  SelectControl
+} = wp.components;
+const {
+  useState,
+  useEffect
+} = wp.element;
+const JobFilterBlock = ({
+  attributes,
+  setAttributes
+}) => {
+  const [locations, setLocations] = useState([]);
+  const [positions, setPositions] = useState([]);
+  const [types, setTypes] = useState([]);
+  const [selectedLocation, setSelectedLocation] = useState('');
+  const [selectedPosition, setSelectedPosition] = useState('');
+  const [selectedType, setSelectedType] = useState('');
+  const [jobs, setJobs] = useState([]);
+  const [visibleId, setVisibleId] = useState(null);
+  const {
+    layout
+  } = attributes || {}; // Destructure layout attribute
+  // Ensure to handle updates to layout using setAttributes
+  const handleLayoutChange = newLayout => {
+    setAttributes({
+      layout: newLayout
+    });
+  };
+  useEffect(() => {
+    fetch(`${sr_job_ajax_object.ajax_url}?action=get_locations`).then(response => response.json()).then(data => setLocations(data));
+    fetch(`${sr_job_ajax_object.ajax_url}?action=get_positions`).then(response => response.json()).then(data => setPositions(data));
+    fetch(`${sr_job_ajax_object.ajax_url}?action=get_types`).then(response => response.json()).then(data => setTypes(data));
+  }, []);
+  const handleFilter = () => {
+    const data = new FormData();
+    data.append('action', 'sr_job_filter_jobs');
+    data.append('sr-job-filter-nonce', sr_job_ajax_object.sr_job_filter_nonce);
+    if (selectedLocation) data.append('location', selectedLocation);
+    if (selectedPosition) data.append('position', selectedPosition);
+    if (selectedType) data.append('type', selectedType);
+    fetch(sr_job_ajax_object.ajax_url, {
+      method: 'POST',
+      body: data
+    }).then(response => response.json()).then(data => setJobs(data));
+  };
+  const toggleVisibility = id => {
+    setVisibleId(visibleId === id ? null : id);
+  };
+  return (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(react__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(InspectorControls, null, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(PanelBody, {
+    title: "Layout Settings"
+  }, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(SelectControl, {
+    label: "Layout",
+    value: layout,
+    options: [{
+      label: 'Left-to-Right',
+      value: 'left-right'
+    }, {
+      label: 'Right-to-Left',
+      value: 'right-left'
+    }, {
+      label: 'Stacked',
+      value: 'stacked'
+    }],
+    onChange: newLayout => handleLayoutChange(newLayout)
+  }))), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
+    className: `container layout-${layout}`
+  }, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
+    className: "row"
+  }, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
+    className: "col-md-4 col-sm-12"
+  }, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
+    className: "sr-job-filter"
+  }, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(SelectControl, {
+    label: "Location",
+    value: selectedLocation,
+    options: locations.map(location => ({
+      label: location.name,
+      value: location.id
+    })),
+    onChange: setSelectedLocation
+  }), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(SelectControl, {
+    label: "Position",
+    value: selectedPosition,
+    options: positions.map(position => ({
+      label: position.name,
+      value: position.id
+    })),
+    onChange: setSelectedPosition
+  }), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(SelectControl, {
+    label: "Type",
+    value: selectedType,
+    options: types.map(type => ({
+      label: type.name,
+      value: type.id
+    })),
+    onChange: setSelectedType
+  }), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("button", {
+    className: "button button-primary",
+    onClick: handleFilter
+  }, "Filter Jobs"))), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
+    className: "col-md-8 col-sm-12"
+  }, jobs.length > 0 && (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
+    className: "sr-job-results"
+  }, jobs.map(job => (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
+    className: "col",
+    key: job.id
+  }, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("h2", {
+    className: "has-large-font-size",
+    dangerouslySetInnerHTML: {
+      __html: job.title
+    }
+  }), visibleId !== job.id ? (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(react__WEBPACK_IMPORTED_MODULE_0__.Fragment, null, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("p", {
+    className: "has-medium-font-size",
+    dangerouslySetInnerHTML: {
+      __html: job.excerpt
+    }
+  }), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("button", {
+    onClick: () => toggleVisibility(job.id)
+  }, "View More")) : (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("div", {
+    id: `sr-job-content-${job.id}`,
+    className: "job-content"
+  }, (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("p", {
+    dangerouslySetInnerHTML: {
+      __html: job.content
+    }
+  }), (0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)("a", {
+    className: "sr-job-apply",
+    href: job.apply_url
+  }, "Apply")))))))));
+};
+registerBlockType('sr/job-filter', {
+  title: 'Job Filter',
+  category: 'widgets',
+  attributes: {
+    layout: {
+      type: 'string',
+      default: 'stacked'
+    }
+  },
+  edit: JobFilterBlock,
+  save: () => null // Dynamic block
+});
+document.addEventListener('DOMContentLoaded', function () {
+  const root = document.getElementById('sr-job-filter-root');
+  // Check if the root element exists
+  if (root) {
+    // Get the block attributes stored in data-attributes
+    const attributes = JSON.parse(root.getAttribute('data-attributes'));
+
+    // Render the JobFilterBlock with attributes passed as props
+    ReactDOM.render((0,react__WEBPACK_IMPORTED_MODULE_0__.createElement)(JobFilterBlock, {
+      attributes: attributes
+    }), root);
+  }
+});
+})();
+
+/******/ })()
+;
+//# sourceMappingURL=block.js.map

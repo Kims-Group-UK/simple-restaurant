@@ -16,7 +16,7 @@ Fast, Lightweight & Secure restaurant plugin. Beautiful & Responsive Menu Templa
 
 👉 [Give a Try](https://demo.milanmalla.com/simple-restaurant) (Clicking this link creates a demo where you can test Simple Restaurant.)
 
-Simple Plugin is the best beginner-friendly WordPress restaurant plugin for creating custom menus, gallery, locations, careers pages etc. 
+Simple Plugin is the best beginner-friendly WordPress restaurant plugin for creating custom menus, gallery, locations, careers pages etc.
 
 👉 [All features](https://milanmalla.com/simple-restaurant) | 👉 [Demo](https://demo.milanmalla.com/simple-restaurant) | 👉 [Documentation](https://docs.milanmalla.com/simple-restaurant)
 

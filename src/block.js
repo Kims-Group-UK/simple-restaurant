@@ -107,7 +107,7 @@
 															<div className="sr-job-results">
 																	{jobs.map(job => (
 																			<div className="col" key={job.id}>
-																					<h2 className="has-large-font-size"><strong>{job.title}</strong></h2>
+																					<h2 className="has-large-font-size" dangerouslySetInnerHTML={{ __html: job.title }}></h2>
 																					{visibleId !== job.id ? (<>
 																							<p className="has-medium-font-size" dangerouslySetInnerHTML={{ __html: job.excerpt }} />
 																								<button onClick={() => toggleVisibility(job.id)}>View More</button>

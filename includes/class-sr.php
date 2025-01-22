@@ -89,4 +89,5 @@ final class SR {
 		new Location();
 		new Job();
 	}
+
 }
