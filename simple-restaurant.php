@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 
 // Define EVF_PLUGIN_FILE.
 if ( ! defined( 'SR_PLUGIN_VERSION' ) ) {
-	define( 'SR_PLUGIN_VERSION', '1.1' );
+	define( 'SR_PLUGIN_VERSION', '1.2' );
 }
 
 // Define EVF_PLUGIN_FILE.
@@ -29,6 +29,17 @@ if ( ! defined( 'SR_PLUGIN_FILE' ) ) {
 // Define EVF_PLUGIN_FILE.
 if ( ! defined( 'SR_PLUGIN_DIR' ) ) {
 	define( 'SR_PLUGIN_DIR', __DIR__ );
+}
+
+/**
+ * Autoload the packages.
+ *
+ * We want to fail gracefully if `composer install` has not been executed yet, so we are checking for the autoloader.
+ * If the autoloader is not present, let's log the failure and display a nice admin notice.
+ */
+$autoloader = __DIR__ . '/vendor/autoload.php';
+if ( is_readable( $autoloader ) && version_compare( PHP_VERSION, '7.1.3', '>=' ) ) {
+	require $autoloader;
 }
 
 // Include the main SimpleRestaurant class.
@@ -138,23 +149,23 @@ function sr_job_ajax_filter_jobs() {
 		if ( $jobs->have_posts() ) {
 			while ( $jobs->have_posts() ) {
 					$jobs->the_post();
-					$locations    = wp_get_post_terms( get_the_ID(), 'sr-job-location' );
-					$positions    = wp_get_post_terms( get_the_ID(), 'sr-job-position' );
+					$locations = wp_get_post_terms( get_the_ID(), 'sr-job-location' );
+					$positions = wp_get_post_terms( get_the_ID(), 'sr-job-position' );
 					// Get the job location and title dynamically
-					$location = reset( wp_list_pluck( $locations, 'name' ) );
-					$position = reset( wp_list_pluck( $positions, 'name' ) );
+					$location  = reset( wp_list_pluck( $locations, 'name' ) );
+					$position  = reset( wp_list_pluck( $positions, 'name' ) );
 					$job_title = get_the_title();
 
 					// Ensure URL encoding for query parameters
 					$location_encoded = urlencode( $location );
-					$job_encoded = urlencode( $title );
+					$job_encoded      = urlencode( $title );
 					$position_encoded = urlencode( $position );
 
 					// Example array with query parameters
 					$query_params = array(
 						'location' => reset( wp_list_pluck( $locations, 'name' ) ),
 						'position' => reset( wp_list_pluck( $positions, 'name' ) ),
-						'job' => get_the_title(), // dynamic job title
+						'job'      => get_the_title(), // dynamic job title
 					);
 
 					// Construct the full URL and apply necessary sanitization
@@ -165,14 +176,14 @@ function sr_job_ajax_filter_jobs() {
 					$full_url = $apply_url . '?' . $query_string;
 
 					// Sanitize the final URL to make it safe to use
-					$final_url = ( $full_url );
+					$final_url    = ( $full_url );
 					$jobs_array[] = array(
 						'link'      => get_permalink(),
 						'id'        => get_the_ID(),
 						'title'     => get_the_title(),
 						'excerpt'   => get_the_excerpt(),
 						'content'   => get_the_content(),
-						'apply_url' => $final_url
+						'apply_url' => $final_url,
 					);
 			}
 		}
@@ -208,7 +219,13 @@ function sr_get_terms( $taxonomy ) {
 	}
 
 	// Add the "All" option at the start of the array
-	array_unshift( $terms_array, array( 'id' => 0, 'name' => 'All' ) );
+	array_unshift(
+		$terms_array,
+		array(
+			'id'   => 0,
+			'name' => 'All',
+		)
+	);
 	wp_send_json( $terms_array );
 }
 
@@ -253,14 +270,17 @@ add_action(
 function render_job_filter_block( $attributes ) {
 	// Output the block HTML, including attributes in a data-attribute
 	return sprintf(
-			'<div id="sr-job-filter-root" data-attributes="%s"></div>',
-			esc_attr( json_encode( $attributes ) ) // Encode attributes as JSON
+		'<div id="sr-job-filter-root" data-attributes="%s"></div>',
+		esc_attr( json_encode( $attributes ) ) // Encode attributes as JSON
 	);
 }
 
-register_block_type( 'sr/job-filter', array(
-	'render_callback' => 'render_job_filter_block',
-) );
+register_block_type(
+	'sr/job-filter',
+	array(
+		'render_callback' => 'render_job_filter_block',
+	)
+);
 
 add_action( 'admin_menu', 'simple_restaurant_add_submenus' );
 
@@ -297,6 +317,24 @@ function simple_restaurant_add_submenus() {
 			null                         // Callback function.
 		);
 	}
+
+	// Add submenus for taxonomies: Categories and Tags for sr-menu.
+	$taxonomies = array(
+		'sr-menu_category' => 'Menu Categories', // Taxonomy for Categories.
+		'sr-menu_tag'      => 'Menu Tags',       // Taxonomy for Tags.
+	);
+
+	// Loop through each taxonomy and add it as a submenu under Simple Restaurant.
+	foreach ( $taxonomies as $taxonomy_slug => $taxonomy_label ) {
+		add_submenu_page(
+			'simple-restaurant',                                // Parent slug, attach to the Simple Restaurant menu.
+			$taxonomy_label,                                    // Page title.
+			$taxonomy_label,                                    // Menu title.
+			'manage_options',                                    // Capability required.
+			"edit-tags.php?taxonomy=$taxonomy_slug&post_type=sr-menu", // URL to taxonomy management page for sr-menu.
+			null                                                // No callback, WordPress will handle it.
+		);
+	}
 }
 
 /**
@@ -325,7 +363,7 @@ function simple_restaurant_dashboard() {
 
 	// Check if the form is submitted and save the option.
 	if ( isset( $_POST['sr_apply_job_url_nonce'] ) && wp_verify_nonce( sanitize_key( wp_unslash( $_POST['sr_apply_job_url_nonce'] ) ), 'save_sr_apply_job_url' ) ) {
-		$sr_apply_job_url = isset( $_POST['sr_apply_job_url'] ) ? sanitize_text_field( wp_unslash( $_POST['sr_apply_job_url'] ) ) : '';
+		$sr_apply_job_url   = isset( $_POST['sr_apply_job_url'] ) ? sanitize_text_field( wp_unslash( $_POST['sr_apply_job_url'] ) ) : '';
 		$sr_allergy_page_id = isset( $_POST['sr_allergy_page_id'] ) ? sanitize_text_field( wp_unslash( $_POST['sr_allergy_page_id'] ) ) : '';
 		update_option( 'sr_apply_job_url', $sr_apply_job_url );
 		update_option( 'sr_allergy_page_id', $sr_allergy_page_id );
@@ -333,10 +371,27 @@ function simple_restaurant_dashboard() {
 	}
 
 	// Get the current value of the option.
-	$sr_apply_job_url = get_option( 'sr_apply_job_url', '' );
+	$sr_apply_job_url   = get_option( 'sr_apply_job_url', '' );
 	$sr_allergy_page_id = get_option( 'sr_allergy_page_id', '' );
 
 	?>
+	<div class="wrap">
+		<h1>SR Menu Importer</h1>
+		<form method="post" enctype="multipart/form-data">
+			<input type="file" name="csv_file" accept=".csv">
+			<input type="submit" name="import_csv" value="Upload & Import" class="button button-primary">
+		</form>
+		<?php
+		if ( isset( $_POST['import_csv'] ) ) {
+			if ( ! empty( $_FILES['csv_file']['tmp_name'] ) ) {
+				$file_path = $_FILES['csv_file']['tmp_name'];
+				sr_menu_import_csv( $file_path );
+			} else {
+				echo "<p style='color: red;'>Please upload a valid CSV file.</p>";
+			}
+		}
+		?>
+	</div>
 	<div class="wrap">
 			<h1>Simple Restaurant Settings</h1>
 			<form method="post">
@@ -367,136 +422,144 @@ function simple_restaurant_dashboard() {
 	<?php
 }
 
-add_action('admin_menu', 'add_allergy_pdf_submenu');
-	function add_allergy_pdf_submenu() {
-		add_submenu_page(
-				'simple-restaurant', // Parent menu slug
-				'Allergy PDF',            // Page title
-				'Allergy PDF',            // Menu title
-				'manage_options',         // Capability
-				'allergy-pdf',            // Menu slug
-				'allergy_pdf_page_callback' // Callback function
-		);
-	}
+add_action( 'admin_menu', 'add_allergy_pdf_submenu' );
+function add_allergy_pdf_submenu() {
+	add_submenu_page(
+		'simple-restaurant', // Parent menu slug
+		'Allergy PDF',            // Page title
+		'Allergy PDF',            // Menu title
+		'manage_options',         // Capability
+		'allergy-pdf',            // Menu slug
+		'allergy_pdf_page_callback' // Callback function
+	);
+}
 
 
 function allergy_pdf_page_callback() {
-    $existing_pdf_url = get_option('allergy_pdf_url', false);
-    ?>
-    <div class="wrap">
-        <h1>Manage Allergy PDF</h1>
+	$existing_pdf_url = get_option( 'allergy_pdf_url', false );
+	?>
+	<div class="wrap">
+		<h1>Manage Allergy PDF</h1>
 
-        <!-- Placeholder for success or error messages -->
-        <div id="sr-allergy-message"></div>
-        <?php if ($existing_pdf_url): ?>
-            <!-- <p id="sr-pdf"><strong>Current PDF:</strong> <a href="<?php echo esc_url($existing_pdf_url); ?>" target="_blank" id="sr-view-pdf">View Current PDF</a></p> -->
-            <p>
-                <button id="sr-change-pdf-button" class="button button-primary">Change PDF</button>
-            </p>
-					  <div id="current-pdf-container">
-                <object id="pdf-object" data="<?php echo esc_url($existing_pdf_url); ?>" type="application/pdf" style="width:100%; height:600px;" aria-label="Current Allergy PDF"></object>
-                <a id="pdf-link" href="<?php echo esc_url($existing_pdf_url); ?>" target="_blank">View Current PDF</a>
-            </div>
-        <?php else: ?>
-            <p id="sr-pdf"><strong>Current PDF:</strong> No PDF uploaded yet.</p>
-            <p>
-                <button id="sr-change-pdf-button" class="button button-primary">Upload PDF</button>
-            </p>
-        <?php endif; ?>
+		<!-- Placeholder for success or error messages -->
+		<div id="sr-allergy-message"></div>
+		<?php if ( $existing_pdf_url ) : ?>
+			<!-- <p id="sr-pdf"><strong>Current PDF:</strong> <a href="<?php echo esc_url( $existing_pdf_url ); ?>" target="_blank" id="sr-view-pdf">View Current PDF</a></p> -->
+			<p>
+				<button id="sr-change-pdf-button" class="button button-primary">Change PDF</button>
+			</p>
+						<div id="current-pdf-container">
+				<object id="pdf-object" data="<?php echo esc_url( $existing_pdf_url ); ?>" type="application/pdf" style="width:100%; height:600px;" aria-label="Current Allergy PDF"></object>
+				<a id="pdf-link" href="<?php echo esc_url( $existing_pdf_url ); ?>" target="_blank">View Current PDF</a>
+			</div>
+		<?php else : ?>
+			<p id="sr-pdf"><strong>Current PDF:</strong> No PDF uploaded yet.</p>
+			<p>
+				<button id="sr-change-pdf-button" class="button button-primary">Upload PDF</button>
+			</p>
+						<div id="current-pdf-container">
+				<object id="pdf-object" data="" type="application/pdf" style="width:100%; height:600px;" aria-label="Current Allergy PDF"></object>
+				<a id="pdf-link" href="" target="_blank">View Current PDF</a>
+			</div>
+		<?php endif; ?>
 
-    </div>
-    <?php
+	</div>
+	<?php
 }
 
 // update_allergy_pdf_block('');
-function update_allergy_pdf_block($new_pdf_url) {
-    // Specify the page ID where the file block resides
-    $page_id = get_option('sr_allergy_page_id', '');
+function update_allergy_pdf_block( $new_pdf_url ) {
+	// Specify the page ID where the file block resides
+	$page_id = get_option( 'sr_allergy_page_id', '' );
 
-    // Retrieve the post object
-    $post = get_post($page_id);
+	// Retrieve the post object
+	$post = get_post( $page_id );
 
-    if (!$post) {
-        return;
-    }
+	if ( ! $post ) {
+		return;
+	}
 
-    // Retrieve current content
-    $content = $post->post_content;
+	// Retrieve current content
+	$content = $post->post_content;
 
-    // Parse blocks to locate the `core/file` block
-    $blocks = parse_blocks($content);
-    $updated_blocks = [];
+	// Parse blocks to locate the `core/file` block
+	$blocks         = parse_blocks( $content );
+	$updated_blocks = array();
 
-    foreach ($blocks as $block) {
-        // Check if it's the `core/file` block
-        if ($block['blockName'] === 'core/file') {
+	foreach ( $blocks as $block ) {
+		// Check if it's the `core/file` block
+		if ( $block['blockName'] === 'core/file' ) {
 
-						if (isset($block['attrs']['href'])) {
-							$block['attrs']['href'] = esc_url($new_pdf_url); // Sanitize URL
-						}
+			if ( isset( $block['attrs']['href'] ) ) {
+				$block['attrs']['href'] = esc_url( $new_pdf_url ); // Sanitize URL
+			}
 
-            // Optionally update the file name (if applicable)
-            if (isset($block['attrs']['fileName'])) {
-                $block['attrs']['fileName'] = basename($new_pdf_url); // Extract the file name
-            }
+			// Optionally update the file name (if applicable)
+			if ( isset( $block['attrs']['fileName'] ) ) {
+				$block['attrs']['fileName'] = basename( $new_pdf_url ); // Extract the file name
+			}
 						$block_content = $block['innerHTML'];
 
-						$block_content = preg_replace("/http[s]?\:.*?.pdf/",$new_pdf_url, $block_content );
-						$block_content = preg_replace("/aria-label=\".*?\"/", 'aria-label="'. basename($new_pdf_url).'"', $block_content);
+						$block_content = preg_replace( '/http[s]?\:.*?.pdf/', $new_pdf_url, $block_content );
+						$block_content = preg_replace( '/aria-label=".*?"/', 'aria-label="' . basename( $new_pdf_url ) . '"', $block_content );
 
-						$new_pdf_name = basename($new_pdf_url);
+						$new_pdf_name = basename( $new_pdf_url );
 
 						$updated_content = preg_replace_callback(
 							'/<a[^>]*href="[^"]+\.pdf"[^>]*>([^<]+)<\/a>/',
-							function($matches) use ($new_pdf_name) {
+							function ( $matches ) use ( $new_pdf_name ) {
 									// $matches[1] contains the current text inside the <a> tag (PDF name)
-									return str_replace($matches[1], $new_pdf_name, $matches[0]);
+									return str_replace( $matches[1], $new_pdf_name, $matches[0] );
 							},
-							$block_content, 1);
+							$block_content,
+							1
+						);
 
 						// Update the block's inner HTML with the modified content
-						$block['innerHTML'] = $updated_content;
+						$block['innerHTML']       = $updated_content;
 						$block['innerContent'][0] = $updated_content;
-        }
-        // Add the (potentially updated) block to the array
-        $updated_blocks[] = $block;
-    }
+		}
+		// Add the (potentially updated) block to the array
+		$updated_blocks[] = $block;
+	}
 
-    // Serialize blocks back into post content
-    $updated_content = serialize_blocks($updated_blocks);
+	// Serialize blocks back into post content
+	$updated_content = serialize_blocks( $updated_blocks );
 
-    // Update the page content with the new file block
-    wp_update_post([
-        'ID' => $page_id,
-        'post_content' => $updated_content,
-    ]);
+	// Update the page content with the new file block
+	wp_update_post(
+		array(
+			'ID'           => $page_id,
+			'post_content' => $updated_content,
+		)
+	);
 }
 
-add_action('wp_ajax_update_allergy_pdf', 'ajax_update_allergy_pdf');
+add_action( 'wp_ajax_update_allergy_pdf', 'ajax_update_allergy_pdf' );
 
 function ajax_update_allergy_pdf() {
 
-    // Check for required permissions
-    if (!current_user_can('manage_options') || !isset($_POST['pdf_url'])) {
-        wp_send_json_error(['message' => 'Unauthorized request.']);
-        return;
-    }
+	// Check for required permissions
+	if ( ! current_user_can( 'manage_options' ) || ! isset( $_POST['pdf_url'] ) ) {
+		wp_send_json_error( array( 'message' => 'Unauthorized request.' ) );
+		return;
+	}
 
-    // Get the PDF URL from the AJAX request
-    $new_pdf_url = esc_url_raw($_POST['pdf_url']);
+	// Get the PDF URL from the AJAX request
+	$new_pdf_url = esc_url_raw( $_POST['pdf_url'] );
 
-    if (!$new_pdf_url) {
-        wp_send_json_error(['message' => 'Invalid PDF URL.']);
-        return;
-    }
+	if ( ! $new_pdf_url ) {
+		wp_send_json_error( array( 'message' => 'Invalid PDF URL.' ) );
+		return;
+	}
 
-    // Update the PDF URL in the database
-    update_option('allergy_pdf_url', $new_pdf_url);
+	// Update the PDF URL in the database
+	update_option( 'allergy_pdf_url', $new_pdf_url );
 
-    // Update the file block on the page
-    update_allergy_pdf_block($new_pdf_url);
+	// Update the file block on the page
+	update_allergy_pdf_block( $new_pdf_url );
 
-    wp_send_json_success(['message' => 'PDF updated successfully!']);
+	wp_send_json_success( array( 'message' => 'PDF updated successfully!' ) );
 }
 
 
@@ -504,19 +567,19 @@ function ajax_update_allergy_pdf() {
 
 
 
-add_action('admin_enqueue_scripts', 'enqueue_media_library');
-function enqueue_media_library($hook) {
-    if ($hook !== 'simple-restaurant_page_allergy-pdf') { // Adjust the hook name if needed
-        return;
-    }
-    wp_enqueue_media(); // Enqueues WordPress media library
-    wp_enqueue_script(
-        'allergy-pdf-media-script',
-        plugin_dir_url(__FILE__) . 'assets/allergy_pdf.js',
-        ['jquery'],
-        '1.0',
-        true
-    );
+add_action( 'admin_enqueue_scripts', 'enqueue_media_library' );
+function enqueue_media_library( $hook ) {
+	if ( $hook !== 'simple-restaurant_page_allergy-pdf' ) { // Adjust the hook name if needed.
+		return;
+	}
+	wp_enqueue_media(); // Enqueues WordPress media library.
+	wp_enqueue_script(
+		'allergy-pdf-media-script',
+		plugin_dir_url( __FILE__ ) . 'assets/allergy_pdf.js',
+		array( 'jquery' ),
+		'1.0',
+		true
+	);
 
-    wp_localize_script('allergy-pdf-media-script', 'ajaxurl', admin_url('admin-ajax.php'));
+	wp_localize_script( 'allergy-pdf-media-script', 'ajaxurl', admin_url( 'admin-ajax.php' ) );
 }

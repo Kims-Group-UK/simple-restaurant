@@ -1,0 +1,40 @@
+name: Release Plugin
+
+on:
+  push:
+    tags:
+      - "v*" # Trigger on tags like v1.0.0
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      # Checkout the repository
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      # Set up Node.js and install dependencies
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: "16" # You can use any version of Node.js
+
+      - name: Install dependencies
+        run: |
+          npm install
+
+      # Run the Gulp tasks to minify JS and CSS
+      - name: Minify plugin files
+        run: |
+          npx gulp minify
+
+      # Zip the plugin folder
+      - name: Create ZIP file
+        run: |
+          zip -r plugin-name.zip wp-content/plugins/your-plugin/
+
+      # Upload the ZIP file to GitHub Release
+      - name: Upload release asset
+        uses: softprops/action-gh-release@v1
+        with:
+          files: plugin-name.zip

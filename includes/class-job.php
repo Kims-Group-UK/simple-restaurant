@@ -89,7 +89,6 @@ final class Job {
 		// Remove the Comments column.
 		unset( $columns['comments'] );
 		unset( $columns['date'] ); // Remove it from its original position.
-		$columns['date'] = $date_column; // Add it to the end.
 		return $columns;
 	}
 
